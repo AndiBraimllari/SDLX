@@ -77,10 +77,11 @@ def admm_demo(imagePath):
     run_sanity_check(image)
 
     # TODO generate R_phi and y from image? check example2d.cpp
+    #  AFAIK radon package in MATLAB offers something similar, equivalent for Python is?
     R_phi, y = generate_R_y(image)
 
     # EVERYTHING(except R_phi and y) is a hyper-parameter
-    f = shearlet_admm(max_iter=50, rho_zero=, rho_one=, rho_two=1, w=, R_phi=R_phi, y=y)
+    # f = shearlet_admm(max_iter=50, rho_zero=, rho_one=, rho_two=1, w=, R_phi=R_phi, y=y)
 
 
 admm_demo('slice_511.jpg')
