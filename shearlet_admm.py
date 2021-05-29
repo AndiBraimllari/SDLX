@@ -6,7 +6,7 @@ from skimage import color
 from skimage import io
 from ttictoc import tic, toc
 from scipy import misc
-from current_shearlets_wip import applyShearletTransform as SH, applyInverseShearletTransform as SHt
+from shearlet_transform import applyShearletTransform as SH, applyInverseShearletTransform as SHt
 
 
 # ========== definitions start here ==========
@@ -42,6 +42,8 @@ def generate_R_y(image, phi=30):
 # ===== shearlet admm starts here =====
 # NB the parameter rho is never used
 def shearlet_admm(max_iter, rho_zero, rho_one, rho_two, w, R_phi, y):  # try having everything as a numpy array
+    tic()
+
     n = np.sqrt(R_phi.shape[1])
     J = calc_J_from(n)
     I_n_squared = identity(n ** 2)
@@ -59,21 +61,22 @@ def shearlet_admm(max_iter, rho_zero, rho_one, rho_two, w, R_phi, y):  # try hav
         b = rho_zero * np.dot(R_phi_t, y) + rho_one * SHt(P1z - P1u) + rho_two * (P2z - P2u)
         f = cg(A, b)
 
-        P1z = shrink(SH(f) + P1u, rho_zero * w / rho_one)
+        P1z = shrink(SH(np.reshape(f, (n, n))) + P1u, rho_zero * w / rho_one)
         P2z = max(f + P2u, np.zeros(n ** 2))
-        P1u = P1u + SH(f) - P1z
+        P1u = P1u + SH(np.reshape(f, (n, n))) - P1z
         P2u = P2u + f - P2z
 
         f_norms.append(np.linalg.norm(f, ord=2))
         iterations += 1
 
+    print('Finished custom shearlet admm solver in ', toc())
     plt.imshow(f_norms)
     plt.show()
     return f
 
 
 def admm_demo(imagePath):
-    image = color.rgb2gray(io.imread(imagePath))  # R ^ M x N
+    image = color.rgb2gray(io.imread(imagePath))  # R ^ M x N, but actually we only currently accept R ^ n x n
     run_sanity_check(image)
 
     # TODO generate R_phi and y from image? check example2d.cpp
@@ -93,9 +96,9 @@ admm_demo('slice_511.jpg')
 # Rphi: m x n^2
 # y: m
 # f: n^2
-# eta: m # this eta is unrelated to the eta in current_shearlets_wip.py
+# eta: m # this eta is unrelated to the eta in shearlet_transform.py
 
-# note that I've used here J (decomposition subbands) and eta from current_shearlets_wip.py interchangeably, they're
+# note that I've used here J (decomposition subbands) and eta from shearlet_transform.py interchangeably, they're
 # probably not identically the same
 
 
