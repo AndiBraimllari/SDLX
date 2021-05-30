@@ -56,32 +56,47 @@ class UNet(nn.Module):
         self.conv1x1 = nn.Conv2d(64, 2, (1, 1))  # TODO does this need to be 2, or can it be 1? what do we need
 
     def forward(self, x):
+        # TODO what if numerator is not power of 16
+        # TODO currently assuming square images
+        _last_latent_space_size = (x.shape[3] - 124) / 16  # NB conv -> w - 2, max pool -> w / 2, tconv -> w * 2
+        _fourth_crop_size = int(_last_latent_space_size * 2)
+        _third_crop_size = int((_fourth_crop_size - 4) * 2)
+        _second_crop_size = int((_third_crop_size - 4) * 2)
+        _first_crop_size = int((_second_crop_size - 4) * 2)
+
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        # TODO 568 -> 392, what's the formula for this, 176/2 = 88
-        xFirstCrop = x[:, :, 88:(88 + 392), 88:(88 + 392)]
-        # TODO first crop here
+        _first_crop_trim = int((x.shape[3] - _first_crop_size) / 2)
+        xFirstCrop = x[:, :, _first_crop_trim:(_first_crop_trim + _first_crop_size),
+                     _first_crop_trim:(_first_crop_trim + _first_crop_size)]
+        # NB first crop here
 
         x = self.pool1(x)
 
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
-        xSecondCrop = x[:, :, 40:(40 + 200), 40:(40 + 200)]  # TODO 280 -> 200
-        # TODO second crop here
+        _second_crop_trim = int((x.shape[3] - _second_crop_size) / 2)
+        xSecondCrop = x[:, :, _second_crop_trim:(_second_crop_trim + _second_crop_size),
+                      _second_crop_trim:(_second_crop_trim + _second_crop_size)]
+        # NB second crop here
 
         x = self.pool2(x)
 
         x = F.relu(self.conv5(x))
         x = F.relu(self.conv6(x))
-        xThirdCrop = x[:, :, 16:(16 + 104), 16:(16 + 104)]  # TODO 136 -> 104
-        # TODO third crop here
+        _third_crop_trim = int((x.shape[3] - _third_crop_size) / 2)
+        xThirdCrop = x[:, :, _third_crop_trim:(_third_crop_trim + _third_crop_size),
+                     _third_crop_trim:(_third_crop_trim + _third_crop_size)]
+        # NB third crop here
 
         x = self.pool3(x)
 
         x = F.relu(self.conv7(x))
         x = F.relu(self.conv8(x))
-        xFourthCrop = x[:, :, 6:(6 + 56), 6:(6 + 56)]  # TODO 64 -> 56
-        # TODO fourth crop here
+        _fourth_crop_trim = int((x.shape[3] - _fourth_crop_size) / 2)
+        xFourthCrop = x[:, :, _fourth_crop_trim:(_fourth_crop_trim + _fourth_crop_size),
+                      _fourth_crop_trim:(_fourth_crop_trim + _fourth_crop_size)]
+        # NB fourth crop here
 
         x = self.pool4(x)
 
@@ -91,25 +106,25 @@ class UNet(nn.Module):
         x = self.transpConv1(x)
 
         x = torch.cat((xFourthCrop, x), 1)
-        x = F.relu(self.conv11(x))  # TODO x conc fourth crop
+        x = F.relu(self.conv11(x))
         x = F.relu(self.conv12(x))
 
         x = self.transpConv2(x)
 
         x = torch.cat((xThirdCrop, x), 1)
-        x = F.relu(self.conv13(x))  # TODO x conc third crop
+        x = F.relu(self.conv13(x))
         x = F.relu(self.conv14(x))
 
         x = self.transpConv3(x)
 
         x = torch.cat((xSecondCrop, x), 1)
-        x = F.relu(self.conv15(x))  # TODO x conc second crop
+        x = F.relu(self.conv15(x))
         x = F.relu(self.conv16(x))
 
         x = self.transpConv4(x)
 
         x = torch.cat((xFirstCrop, x), 1)
-        x = F.relu(self.conv17(x))  # TODO x conc first crop
+        x = F.relu(self.conv17(x))
         x = F.relu(self.conv18(x))
 
         x = self.conv1x1(x)

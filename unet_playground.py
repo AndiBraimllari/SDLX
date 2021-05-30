@@ -1,10 +1,10 @@
-import imageio
 import torch
 import torchvision
 import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from torchvision.datasets import Cityscapes
 import numpy as np
 from matplotlib import pyplot as plt
 from skimage import color
@@ -15,82 +15,79 @@ from UNet import UNet
 
 
 # ========== definitions start here ==========
-def imshow(img):
-    img = img / 2 + 0.5  # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
+def get_training_data():
+    transform = transforms.Compose(
+        [transforms.ToTensor(),
+         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    batch_size = 1
+
+    trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+                                            download=True, transform=transform)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+                                              shuffle=True, num_workers=2)
+
+    testset = torchvision.datasets.CIFAR10(root='./data', train=False,
+                                           download=True, transform=transform)
+    testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                             shuffle=False, num_workers=2)
+
+    classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+    return trainloader
+
+
+def train_net(my_net, train_loader):
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(my_net.parameters(), lr=0.001, momentum=0.9)
+
+    for epoch in range(2):  # loop over the dataset multiple times
+        running_loss = 0.0
+        for i, data in enumerate(train_loader, 0):
+            # get the inputs; data is a list of [inputs, labels]
+            inputs, labels = data
+
+            # inputImage = torch.from_numpy(color.rgb2gray(inputs[0]))
+
+            # print(torch.reshape(inputs[0][0], (1, 1, 32, 32)).shape)
+
+            mySlice = color.rgb2gray(io.imread('rsz_572pls.jpg')).astype(np.float32)
+
+            mySlice = torch.from_numpy(mySlice)
+            mySlice = torch.reshape(mySlice, (1, 1, mySlice.shape[0], mySlice.shape[1]))
+
+            # zero the parameter gradients
+            optimizer.zero_grad()
+
+            # forward + backward + optimize
+            outputs = my_net(mySlice)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            # print statistics
+            running_loss += loss.item()
+            if i % 2000 == 1999:  # print every 2000 mini-batches
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 2000))
+                running_loss = 0.0
+
+    print('Finished Training')
 
 
 # ========== playground start here ==========
-transform = transforms.Compose(
-    [transforms.ToTensor(),
-     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+def demo():
+    unet = UNet()
 
-batch_size = 1
+    train_net(unet, get_training_data())
 
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
-                                        download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                          shuffle=True, num_workers=2)
 
-testset = torchvision.datasets.CIFAR10(root='./data', train=False,
-                                       download=True, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                         shuffle=False, num_workers=2)
+demo()
 
-classes = ('plane', 'car', 'bird', 'cat',
-           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+# # TODO dataset for training Cityscapes?
+# dataset = Cityscapes('./data/cityscapes', split='train', mode='fine', target_type='semantic')
+# img, smnt = dataset[0]
 
-# get some random training images
-dataiter = iter(trainloader)
-images, labels = dataiter.next()
-
-# # show images
-# imshow(torchvision.utils.make_grid(images))
-# # print labels
-# print(' '.join('%5s' % classes[labels[j]] for j in range(batch_size)))
-
-unet = UNet()
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(unet.parameters(), lr=0.001, momentum=0.9)
-
-for epoch in range(2):  # loop over the dataset multiple times
-    running_loss = 0.0
-    for i, data in enumerate(trainloader, 0):
-        # get the inputs; data is a list of [inputs, labels]
-        inputs, labels = data
-
-        # inputImage = torch.from_numpy(color.rgb2gray(inputs[0]))
-
-        # print(torch.reshape(inputs[0][0], (1, 1, 32, 32)).shape)
-
-        mySlice = color.rgb2gray(io.imread('rsz_572pls.jpg')).astype(np.float32)
-
-        print(mySlice.shape)
-        mySlice = torch.from_numpy(mySlice)
-        mySlice = torch.reshape(mySlice, (1, 1, 572, 572))
-        # inputs = torch.(inputs, (4, 1, 32, 32))
-
-        # zero the parameter gradients
-        optimizer.zero_grad()
-
-        # forward + backward + optimize
-        outputs = unet(mySlice)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-
-        # print statistics
-        running_loss += loss.item()
-        if i % 2000 == 1999:  # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
-            running_loss = 0.0
-
-print('Finished Training')
-
+# ========== deprecated stuff ==========
 # PATH = './cifar_net.pth'
 # torch.save(unet.state_dict(), PATH)
 #
