@@ -1,3 +1,4 @@
+import imageio
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -26,7 +27,7 @@ transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-batch_size = 4
+batch_size = 1
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
@@ -61,11 +62,22 @@ for epoch in range(2):  # loop over the dataset multiple times
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
 
+        # inputImage = torch.from_numpy(color.rgb2gray(inputs[0]))
+
+        # print(torch.reshape(inputs[0][0], (1, 1, 32, 32)).shape)
+
+        mySlice = color.rgb2gray(io.imread('rsz_572pls.jpg')).astype(np.float32)
+
+        print(mySlice.shape)
+        mySlice = torch.from_numpy(mySlice)
+        mySlice = torch.reshape(mySlice, (1, 1, 572, 572))
+        # inputs = torch.(inputs, (4, 1, 32, 32))
+
         # zero the parameter gradients
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = unet(inputs)
+        outputs = unet(mySlice)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
