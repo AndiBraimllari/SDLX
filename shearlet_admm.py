@@ -6,6 +6,7 @@ from skimage import color
 from skimage import io
 from ttictoc import tic, toc
 from scipy import misc
+from skimage.transform import radon, rescale
 from shearlet_transform import applyShearletTransform as SH, applyInverseShearletTransform as SHt
 
 
@@ -16,15 +17,21 @@ def run_sanity_check(image):
 
 
 def max(a, b):  # element wise max
-    if a.shape != b.shape[0]:
+    if a.shape[0] != b.shape[0]:
         raise ValueError('Unmatching dimensions in inputs of element wise max')
-    # TODO add logic
+    res = np.zeros(a.shape[0])
+    for i in range(a.shape[0]):
+        res[i] = max(a[i], b[i])
+    return res
 
 
 def shrink(a, b):  # element wise shrink
-    if a.shape != b.shape[0]:
+    if a.shape[0] != b.shape[0]:
         raise ValueError('Unmatching dimensions in inputs of element wise shrink')
-    # TODO add logic
+    res = np.zeros(a.shape[0])
+    for i in range(a.shape[0]):
+        res[i] = max(abs(a[i]) - b[i], 0) * (a[i] / abs(a[i])) if a[i] != 0 else 0
+    return res
 
 
 # NB eta and J are used interchangeably
@@ -35,8 +42,11 @@ def calc_J_from(n):
 
 # TODO is 30 a good default value here? what value makes sense?
 def generate_R_y(image, phi=30):
-    return np.array([]), np.array([])
-    # TODO add logic
+    theta = np.linspace(0., 180., max(image.shape), endpoint=False)  # TODO use phi here
+    sinogram = radon(image, theta=theta)
+    # TODO sinogram is y? R projector?
+    return sinogram, np.array([])
+    # TODO note that based on this current code, sinogram.shape == image.shape
 
 
 # ===== shearlet admm starts here =====
