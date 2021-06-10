@@ -74,13 +74,13 @@ def psiHathxv(w1, w2):  # separable generating function?
     # TODO add checks over the input here?
     res = 0
     if abs(w1) >= 1 / 2 and abs(w2) < abs(w1):
-        res += phiHat(w1, w2)
+        res += psiHat(w1, w2)
     if abs(w2) >= 1 / 2 and abs(w2) > abs(w1):
         res += psiHat(w2, w1)
     if abs(w1) >= 1 / 2 and abs(w2) >= 1 / 2 and abs(w2) == abs(w1):
         res += psiHat(w1, w2)
     return res
-    # return phiHat(w1, w2) + psiHat(w2, w1) + phiHat(w1, w2)
+    # return psiHat(w1, w2) + psiHat(w2, w1) + psiHat(w1, w2)
 
 
 # ===== shearlet transforms starts here =====
@@ -150,7 +150,6 @@ def applyShearletTransform(img):
                     raise ValueError('Unexpected state! Non-zero imaginary parts found in SHSectionhxv!')
                 SHf[i] = SHSectionhxv
                 i += 1
-                # print(j, k)
                 plt.imshow(np.real(CURR_TEMP), cmap='gray')  # cmap='gray'  # np.imag
                 plt.show()
                 plt.imshow(np.real(SHSectionhxv), cmap='gray')  # cmap='gray'  # np.imag
@@ -212,9 +211,9 @@ def applyInverseShearletTransform(SHf):
                 i += 1
                 fHat += SHtSectionh + SHtSectionv
             elif abs(k) == 2 ** j:
-                SHtSecctionhxv = np.multiply(np.fft.fft2(SHf[i]), tempSHSectionhxv)
+                SHtSectionhxv = np.multiply(np.fft.fft2(SHf[i]), tempSHSectionhxv)
                 i += 1
-                fHat += SHtSecctionhxv
+                fHat += SHtSectionhxv
 
             # if fHat.all() != np.real(fHat).all():  # TODO do I need to do some check here for fHat?
             #     print(?)
@@ -229,10 +228,8 @@ def applyInverseShearletTransform(SHf):
     SHtSectionZero = np.multiply(np.fft.fft2(SHf[i]), tempSHtcSectionZero)
     fHat += SHtSectionZero
 
-    # try np.fft.fftshift(fHat)?
-    f = np.fft.ifft2(fHat)  # TODO this is the reconstruction, is it?
     print('Finished inverse shearlet transform in', toc())  # AFAIK SH is orthogonal, therefore inverse == transpose
-    return f
+    return np.fft.ifft2(fHat)
 
 
 # ========== demo starts here ==========
