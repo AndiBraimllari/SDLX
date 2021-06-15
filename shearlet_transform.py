@@ -129,8 +129,12 @@ def applyShearletTransform(img):
                         # TODO observe values of w1 and w2
                         # print(w1, w2)
                         # section of the seam lines
-                        tempSHSectionhxv[w1, w2] = psiHathxv(4 ** (-j) * w1, 4 ** (-j) * k * w1 + 2 ** (-j) * w2) * \
-                                                   fftImg[w1][w2]
+                        if abs(w2) <= abs(w1):
+                            tempSHSectionhxv[w1, w2] = psiHat(4 ** (-j) * w1, 4 ** (-j) * k * w1 + 2 ** (-j) * w2) * \
+                                                       fftImg[w1][w2]
+                        else:
+                            tempSHSectionhxv[w1, w2] = psiHat(4 ** (-j) * w2, 4 ** (-j) * k * w2 + 2 ** (-j) * w1) * \
+                                                       fftImg[w1][w2]
                         CURR_TEMP[w1, w2] = psiHathxv(4 ** (-j) * w1, 4 ** (-j) * k * w1 + 2 ** (-j) * w2)
             if abs(k) <= 2 ** j - 1:
                 SHSectionh = np.fft.ifft2(tempSHSectionh)
@@ -203,7 +207,10 @@ def applyInverseShearletTransform(SHf):
                         tempSHSectionv[w1, w2] = psiHat(4 ** (-j) * w2, 4 ** (-j) * k * w2 + 2 ** (-j) * w1)
                     elif abs(k) == 2 ** j:
                         # section of the seam lines
-                        tempSHSectionhxv[w1, w2] = psiHathxv(4 ** (-j) * w1, 4 ** (-j) * k * w1 + 2 ** (-j) * w2)
+                        if abs(w2) <= abs(w1):
+                            tempSHSectionhxv[w1, w2] = psiHat(4 ** (-j) * w1, 4 ** (-j) * k * w1 + 2 ** (-j) * w2)
+                        else:
+                            tempSHSectionhxv[w1, w2] = psiHat(4 ** (-j) * w2, 4 ** (-j) * k * w2 + 2 ** (-j) * w1)
             if abs(k) <= 2 ** j - 1:
                 SHtSectionh = np.multiply(np.fft.fft2(SHf[i]), tempSHSectionh)
                 i += 1
