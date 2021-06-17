@@ -1,13 +1,9 @@
 import numpy as np
-from matplotlib import pyplot as plt
-from skimage import color
-from skimage import io
 from ttictoc import tic, toc
 from shearlet_definitions import psiHat, phiHat
-from scipy import misc
 
 
-def applyShearletTransform(img, spectra=None):
+def applyShearletTransform(img, spectra=None, jZero=None):
     """
     Calculates the Cone-Adapted discrete shearlet transform of a given image.
 
@@ -24,7 +20,7 @@ def applyShearletTransform(img, spectra=None):
     print('Shape of the input image in the shearlet transform is:', img.shape)
 
     if spectra is None:
-        spectra = calculateSpectra(M, N)
+        spectra = calculateSpectra(M, N, jZero=jZero)
 
     fftImg = np.fft.fft2(img)
     SHf = np.fft.ifft2(spectra * fftImg)
@@ -121,53 +117,3 @@ def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
                 i += 1
 
     return spectra
-
-
-def shearlet_demo(imagePath):
-    image = color.rgb2gray(io.imread(imagePath))  # R ^ M x N
-    # image = misc.face(gray=True)
-    plt.imshow(image, cmap='gray')
-    plt.title('ground truth')
-    plt.colorbar()
-    plt.show()
-
-    # takes about 36 seconds to run
-    spectra = calculateSpectra(image.shape[0], image.shape[1])
-
-    shearletCoeffs, _ = applyShearletTransform(image, spectra=spectra)
-
-    # takes about <1 second to run
-    reconstruction = applyInverseShearletTransform(shearletCoeffs, spectra=spectra)
-
-    # takes about 36 seconds to run
-    # reconstruction = applyInverseShearletTransform(shearletCoeffs)
-
-    plt.imshow(reconstruction, cmap='gray')
-    plt.title('recon.')
-    plt.colorbar()
-    plt.show()
-
-    reconGtDiff = reconstruction - image
-    plt.imshow(reconGtDiff, cmap='gray')
-    plt.title('diff.')
-    plt.colorbar()
-    plt.show()
-
-    # fig, axes = plt.subplots(1, 3)
-    #
-    # axes[0].imshow(image, cmap='gray')
-    # axes[0].set_axis_off()
-    # axes[0].set_title('gt')
-    #
-    # axes[1].imshow(reconstruction, cmap='gray')
-    # axes[1].set_axis_off()
-    # axes[1].set_title('recon.')
-    #
-    # axes[2].imshow(reconGtDiff, cmap='gray')
-    # axes[2].set_axis_off()
-    # axes[2].set_title('diff (sum of squares {})'.format(np.sum(np.square(np.concatenate(image - reconstruction)))))
-    #
-    # plt.show()
-
-
-shearlet_demo('../slice_511.jpg')
