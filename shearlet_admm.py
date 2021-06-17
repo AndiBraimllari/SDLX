@@ -7,7 +7,7 @@ from skimage import io
 from ttictoc import tic, toc
 from scipy import misc
 from skimage.transform import radon, rescale
-from shearlet_transform import applyShearletTransform as SH, applyInverseShearletTransform as SHt
+from shearlet_transform.shearlet_transform import applyShearletTransform as SH, applyInverseShearletTransform as SHt
 
 
 # ========== definitions start here ==========
