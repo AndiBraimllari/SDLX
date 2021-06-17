@@ -34,7 +34,7 @@ def shrink(a, b):  # element wise shrink
     return res
 
 
-# NB eta and J are used interchangeably
+# NB L and J are used interchangeably
 def calc_J_from(n):
     return 59
     # TODO add logic
@@ -106,9 +106,9 @@ admm_demo('slice_511.jpg')
 # Rphi: m x n^2
 # y: m
 # f: n^2
-# eta: m # this eta is unrelated to the eta in shearlet_transform.py
+# eta: m
 
-# note that I've used here J (decomposition subbands) and eta from shearlet_transform.py interchangeably, they're
+# note that I've used here J (decomposition subbands) and L from shearlet_transform.py interchangeably, they're
 # probably not identically the same
 
 

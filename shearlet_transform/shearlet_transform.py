@@ -9,9 +9,12 @@ def applyShearletTransform(img, spectra=None, jZero=None):
 
     Parameters:
     img (numpy.ndarray): Image of shape (M, N).
+    spectra (numpy.ndarray): Shearlet spectra of shape (L, M, N). Providing this object avoids its recalculation and
+    drastically increases performance.
+    jZero (int): Number of scales.
 
     Returns:
-    numpy.ndarray: 3D object of shape (eta, M, N) containing its calculated shearlet transform.
+    numpy.ndarray: 3D object of shape (L, M, N) containing its calculated shearlet transform.
    """
     tic()
     M = img.shape[0]
@@ -34,12 +37,14 @@ def applyInverseShearletTransform(SHf, spectra=None, real=True):
     Calculates the Cone-Adapted discrete shearlet inverse transform of a given image.
 
     Parameters:
-    SHf (numpy.ndarray): Shearlet coefficients of shape (eta, M, N)
-    spectra (numpy.ndarray): Shearlet spectra of shape (eta, M, N). Providing this object avoids its recalculation and
+    SHf (numpy.ndarray): Shearlet coefficients of shape (L, M, N)
+    spectra (numpy.ndarray): Shearlet spectra of shape (L, M, N). Providing this object avoids its recalculation and
     drastically increases performance.
+    real (bool):
+
 
     Returns:
-    numpy.ndarray: 3D object of shape (eta, M, N) containing its calculated shearlet transform
+    numpy.ndarray: 3D object of shape (L, M, N) containing its calculated shearlet transform
    """
     tic()
     M = SHf.shape[1]
@@ -61,24 +66,24 @@ def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
     well as the number scales
 
     Parameters:
-    M (int): Width
-    N (int): Length
+    M (int): Width.
+    N (int): Length.
     a (lambda): The parabolic scaling (dilation) parameter.
-    s (lambda): The shearing parameter
-    jZero (int): Number of scales
+    s (lambda): The shearing parameter.
+    jZero (int): Number of scales.
 
     The parameters a and s are currently lambdas that have a set number of inputs, ideally should take any
 
     Returns:
-    numpy.ndarray: 3D object of shape (eta, M, N) containing the calculated spectra
+    numpy.ndarray: 3D object of shape (L, M, N) containing the calculated spectra
    """
     print('Shape required for constructing this spectra is:({}, {})'.format(M, N))
 
     if jZero is None:
         jZero = int(np.floor(1 / 2 * np.log2(max(M, N))))
 
-    eta = 2 ** (jZero + 2) - 3
-    spectra = np.zeros([eta, M, N])
+    L = 2 ** (jZero + 2) - 3
+    spectra = np.zeros([L, M, N])
 
     i = 0
 

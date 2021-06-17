@@ -6,9 +6,9 @@ from scipy import misc
 from shearlet_transform import calculateSpectra, applyShearletTransform, applyInverseShearletTransform
 
 
-def shearlet_demo(imagePath):
-    image = color.rgb2gray(io.imread(imagePath))  # R ^ M x N
-    # image = misc.face(gray=True)
+def shearlet_demo(imagePath):  # expecting image of shape MxN
+    # image = color.rgb2gray(io.imread(imagePath))
+    image = misc.face(gray=True)
     plt.imshow(image, cmap='gray')
     plt.title('ground truth')
     plt.colorbar()

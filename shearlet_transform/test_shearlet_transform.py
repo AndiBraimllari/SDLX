@@ -3,6 +3,7 @@ import numpy as np
 from skimage import io
 from skimage import color
 from numpy.testing import *
+from scipy import misc
 
 from shearlet_transform import calculateSpectra, applyShearletTransform, applyInverseShearletTransform
 
@@ -14,7 +15,7 @@ class TestShearletTransform(unittest.TestCase):
     """
 
     def test_recon_with_gt(self):
-        image = color.rgb2gray(io.imread('../slice_511.jpg'))
+        image = misc.face(gray=True)
 
         SHf, spectra = applyShearletTransform(image, jZero=5)
         recon = applyInverseShearletTransform(SHf, spectra=spectra)
@@ -29,7 +30,7 @@ class TestShearletTransform(unittest.TestCase):
         from An Introduction to Frames and Riesz Bases). This ensures that the spectra we generated exhibits desired
         behaviour.
         """
-        image = color.rgb2gray(io.imread('../slice_511.jpg'))
+        image = misc.face(gray=True)
 
         spectra = calculateSpectra(image.shape[0], image.shape[1], jZero=5)
 
