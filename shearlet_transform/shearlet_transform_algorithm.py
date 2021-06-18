@@ -1,6 +1,7 @@
 import numpy as np
 from ttictoc import tic, toc
-from shearlet_definitions import psiHat, phiHat
+
+from shearlet_transform.shearlet_definitions import psiHat, phiHat
 
 
 def applyShearletTransform(img, spectra=None, jZero=None):

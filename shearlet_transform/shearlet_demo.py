@@ -1,9 +1,10 @@
 from matplotlib import pyplot as plt
+from scipy import misc
 from skimage import color
 from skimage import io
-from scipy import misc
 
-from shearlet_transform import calculateSpectra, applyShearletTransform, applyInverseShearletTransform
+from shearlet_transform.shearlet_transform_algorithm import calculateSpectra, applyShearletTransform, \
+    applyInverseShearletTransform
 
 
 def shearlet_demo(imagePath):  # expecting image of shape MxN
