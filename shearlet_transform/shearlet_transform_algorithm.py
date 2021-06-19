@@ -9,22 +9,22 @@ def applyShearletTransform(img, spectra=None, jZero=None):
     Calculates the Cone-Adapted discrete shearlet transform of a given image.
 
     Parameters:
-    img (numpy.ndarray): Image of shape (M, N).
-    spectra (numpy.ndarray): Shearlet spectra of shape (L, M, N). Providing this object avoids its recalculation and
+    img (numpy.ndarray): Image of shape (W, H).
+    spectra (numpy.ndarray): Shearlet spectra of shape (L, W, H). Providing this object avoids its recalculation and
     drastically increases performance.
     jZero (int): Number of scales.
 
     Returns:
-    numpy.ndarray: 3D object of shape (L, M, N) containing its calculated shearlet transform.
+    numpy.ndarray: 3D object of shape (L, W, H) containing its calculated shearlet transform.
    """
     tic()
-    M = img.shape[0]
-    N = img.shape[1]
+    W = img.shape[0]
+    H = img.shape[1]
 
     print('Shape of the input image in the shearlet transform is:', img.shape)
 
     if spectra is None:
-        spectra = calculateSpectra(M, N, jZero=jZero)
+        spectra = calculateSpectra(W, H, jZero=jZero)
 
     fftImg = np.fft.fft2(img)
     SHf = np.fft.ifft2(spectra * fftImg)
@@ -48,11 +48,11 @@ def applyInverseShearletTransform(SHf, spectra=None, real=True):
     numpy.ndarray: 3D object of shape (L, M, N) containing its calculated shearlet transform
    """
     tic()
-    M = SHf.shape[1]
-    N = SHf.shape[2]
+    W = SHf.shape[1]
+    H = SHf.shape[2]
 
     if spectra is None:
-        spectra = calculateSpectra(M, N)
+        spectra = calculateSpectra(W, H)
 
     print('Finished inverse shearlet transform in: ', toc())  # AFAIK SH is orthogonal, therefore inverse == transpose
     if real:
@@ -67,8 +67,8 @@ def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
     well as the number scales
 
     Parameters:
-    M (int): Width.
-    N (int): Length.
+    W (int): Width.
+    H (int): Length.
     a (lambda): The parabolic scaling (dilation) parameter.
     s (lambda): The shearing parameter.
     jZero (int): Number of scales.
@@ -76,7 +76,7 @@ def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
     The parameters a and s are currently lambdas that have a set number of inputs, ideally should take any
 
     Returns:
-    numpy.ndarray: 3D object of shape (L, M, N) containing the calculated spectra
+    numpy.ndarray: 3D object of shape (L, W, H) containing the calculated spectra
     """
     print('Shape required for constructing this spectra is:({}, {})'.format(M, N))
 
@@ -129,5 +129,5 @@ def calc_L_from_scales(jZero):
     return 2 ** (jZero + 2) - 3
 
 
-def calc_L_from_shape(M, N=0):
-    return 2 ** (int(np.floor(1 / 2 * np.log2(max(M, N)))) + 2) - 3
+def calc_L_from_shape(W, H=0):
+    return 2 ** (int(np.floor(1 / 2 * np.log2(max(W, H)))) + 2) - 3

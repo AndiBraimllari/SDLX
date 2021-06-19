@@ -8,7 +8,7 @@ from shearlet_admm_definitions import run_sanity_check, generate_R_y
 
 
 def admm_demo(imagePath):
-    image = color.rgb2gray(io.imread(imagePath))  # R ^ M x N, but actually we only currently accept R ^ n x n
+    image = color.rgb2gray(io.imread(imagePath))  # R ^ W x H, but actually we only currently accept R ^ W x W
     run_sanity_check(image)
 
     # TODO generate R_phi and y from image? check example2d.cpp
