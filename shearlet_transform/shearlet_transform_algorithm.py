@@ -77,13 +77,13 @@ def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
 
     Returns:
     numpy.ndarray: 3D object of shape (L, M, N) containing the calculated spectra
-   """
+    """
     print('Shape required for constructing this spectra is:({}, {})'.format(M, N))
 
     if jZero is None:
         jZero = int(np.floor(1 / 2 * np.log2(max(M, N))))
 
-    L = 2 ** (jZero + 2) - 3
+    L = calc_L_from_scales(jZero)
     spectra = np.zeros([L, M, N])
 
     i = 0
@@ -123,3 +123,11 @@ def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
                 i += 1
 
     return spectra
+
+
+def calc_L_from_scales(jZero):
+    return 2 ** (jZero + 2) - 3
+
+
+def calc_L_from_shape(M, N=0):
+    return 2 ** (int(np.floor(1 / 2 * np.log2(max(M, N)))) + 2) - 3
