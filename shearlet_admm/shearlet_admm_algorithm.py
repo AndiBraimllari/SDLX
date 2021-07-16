@@ -71,12 +71,14 @@ def shearlet_admm(rho_zero, rho_one, rho_two, w, R_phi, y, max_iter=20, L=None):
 
 # ========== shapes of relevant objects ==========
 
-# SH: J n^2 x n^2
-# SH(f): J n x n
+# SH: L n^2 x n^2
+# SH(f): L n x n
 # Rphi: m x n^2
-# y: m
+# Rphi(x): m
+# y: m (eta: m)
 # f: n^2
-# eta: m
+# z: R ^ (L+1)n^2
+# u: R ^ (L+1)n^2
 
 # J <-> L
 

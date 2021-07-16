@@ -38,11 +38,10 @@ def applyInverseShearletTransform(SHf, spectra=None, real=True):
     Calculates the Cone-Adapted discrete shearlet inverse transform of a given image.
 
     Parameters:
-    SHf (numpy.ndarray): Shearlet coefficients of shape (L, M, N)
-    spectra (numpy.ndarray): Shearlet spectra of shape (L, M, N). Providing this object avoids its recalculation and
+    SHf (numpy.ndarray): Shearlet coefficients of shape (L, W, H)
+    spectra (numpy.ndarray): Shearlet spectra of shape (L, W, H). Providing this object avoids its recalculation and
     drastically increases performance.
     real (bool):
-
 
     Returns:
     numpy.ndarray: 3D object of shape (L, M, N) containing its calculated shearlet transform
@@ -61,7 +60,7 @@ def applyInverseShearletTransform(SHf, spectra=None, real=True):
         return np.sum(np.fft.ifft2(np.fft.fft2(SHf) * spectra), axis=0)
 
 
-def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-j), jZero=None):
+def calculateSpectra(W, H, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-j), jZero=None):
     """
     Calculates the spectra for a given shape. One can also specify the parabolic scaling (dilation) and shearing, as
     well as the number scales
@@ -78,30 +77,30 @@ def calculateSpectra(M, N, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
     Returns:
     numpy.ndarray: 3D object of shape (L, W, H) containing the calculated spectra
     """
-    print('Shape required for constructing this spectra is:({}, {})'.format(M, N))
+    print('Shape required for constructing this spectra is:({}, {})'.format(W, H))
 
     if jZero is None:
-        jZero = int(np.floor(1 / 2 * np.log2(max(M, N))))
+        jZero = int(np.floor(1 / 2 * np.log2(max(W, H))))
 
     L = calc_L_from_scales(jZero)
-    spectra = np.zeros([L, M, N])
+    spectra = np.zeros([L, W, H])
 
     i = 0
 
-    tempSHtcSectionZero = np.zeros([M, N])
-    for w1 in range(int(-np.floor(M / 2)), int(np.ceil(M / 2))):
-        for w2 in range(int(-np.floor(N / 2)), int(np.ceil(N / 2))):
+    tempSHtcSectionZero = np.zeros([W, H])
+    for w1 in range(int(-np.floor(W / 2)), int(np.ceil(W / 2))):
+        for w2 in range(int(-np.floor(H / 2)), int(np.ceil(H / 2))):
             tempSHtcSectionZero[w1, w2] = phiHat(w1, w2)
     spectra[i] = tempSHtcSectionZero
     i += 1
 
     for j in range(jZero):
         for k in range(-2 ** j, 2 ** j + 1):
-            tempSHSectionh = np.zeros([M, N])
-            tempSHSectionv = np.zeros([M, N])
-            tempSHSectionhxv = np.zeros([M, N])
-            for w1 in range(int(-np.floor(M / 2)), int(np.ceil(M / 2))):
-                for w2 in range(int(-np.floor(N / 2)), int(np.ceil(N / 2))):
+            tempSHSectionh = np.zeros([W, H])
+            tempSHSectionv = np.zeros([W, H])
+            tempSHSectionhxv = np.zeros([W, H])
+            for w1 in range(int(-np.floor(W / 2)), int(np.ceil(W / 2))):
+                for w2 in range(int(-np.floor(H / 2)), int(np.ceil(H / 2))):
                     horiz = 0
                     vertic = 0
                     if abs(w2) <= abs(w1):
@@ -130,4 +129,5 @@ def calc_L_from_scales(jZero):
 
 
 def calc_L_from_shape(W, H=0):
-    return 2 ** (int(np.floor(1 / 2 * np.log2(max(W, H)))) + 2) - 3
+    jZero = int(np.floor(1 / 2 * np.log2(max(W, H))))
+    return 2 ** (jZero + 2) - 3
