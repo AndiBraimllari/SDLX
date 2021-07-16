@@ -87,11 +87,11 @@ def calculateSpectra(W, H, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
 
     i = 0
 
-    tempSHtcSectionZero = np.zeros([W, H])
+    tempSHSectionZero = np.zeros([W, H])
     for w1 in range(int(-np.floor(W / 2)), int(np.ceil(W / 2))):
         for w2 in range(int(-np.floor(H / 2)), int(np.ceil(H / 2))):
-            tempSHtcSectionZero[w1, w2] = phiHat(w1, w2)
-    spectra[i] = tempSHtcSectionZero
+            tempSHSectionZero[w1, w2] = phiHat(w1, w2)
+    spectra[i] = tempSHSectionZero
     i += 1
 
     for j in range(jZero):
