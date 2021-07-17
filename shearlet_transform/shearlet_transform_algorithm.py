@@ -87,18 +87,18 @@ def calculateSpectra(W, H, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
 
     i = 0
 
-    tempSHSectionZero = np.zeros([W, H])
+    sectionZero = np.zeros([W, H])
     for w1 in range(int(-np.floor(W / 2)), int(np.ceil(W / 2))):
         for w2 in range(int(-np.floor(H / 2)), int(np.ceil(H / 2))):
-            tempSHSectionZero[w1, w2] = phiHat(w1, w2)
-    spectra[i] = tempSHSectionZero
+            sectionZero[w1, w2] = phiHat(w1, w2)
+    spectra[i] = sectionZero
     i += 1
 
     for j in range(jZero):
         for k in range(-2 ** j, 2 ** j + 1):
-            tempSHSectionh = np.zeros([W, H])
-            tempSHSectionv = np.zeros([W, H])
-            tempSHSectionhxv = np.zeros([W, H])
+            sectionh = np.zeros([W, H])
+            sectionv = np.zeros([W, H])
+            sectionhxv = np.zeros([W, H])
             for w1 in range(int(-np.floor(W / 2)), int(np.ceil(W / 2))):
                 for w2 in range(int(-np.floor(H / 2)), int(np.ceil(H / 2))):
                     horiz = 0
@@ -108,17 +108,17 @@ def calculateSpectra(W, H, a=lambda j: 2 ** (-2 * j), s=lambda j, k: k * 2 ** (-
                     else:
                         vertic = psiHat(a(j) * w2, np.sqrt(a(j)) * s(j, k) * w2 + np.sqrt(a(j)) * w1)
                     if abs(k) <= 2 ** j - 1:
-                        tempSHSectionh[w1, w2] = horiz
-                        tempSHSectionv[w1, w2] = vertic
+                        sectionh[w1, w2] = horiz
+                        sectionv[w1, w2] = vertic
                     elif abs(k) == 2 ** j:
-                        tempSHSectionhxv[w1, w2] = horiz + vertic
+                        sectionhxv[w1, w2] = horiz + vertic
             if abs(k) <= 2 ** j - 1:
-                spectra[i] = tempSHSectionh
+                spectra[i] = sectionh
                 i += 1
-                spectra[i] = tempSHSectionv
+                spectra[i] = sectionv
                 i += 1
             elif abs(k) == 2 ** j:
-                spectra[i] = tempSHSectionhxv
+                spectra[i] = sectionhxv
                 i += 1
 
     return spectra
