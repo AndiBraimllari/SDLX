@@ -9,12 +9,11 @@ from shearlet_transform import calculateSpectra, applyShearletTransform, applyIn
 
 
 class TestShearletTransform(unittest.TestCase):
-    """
-    Test how close the reconstruction to the ground truth really is. Increasing the number of scales lowers the L2 norm
-    of the difference between these two.
-    """
-
     def test_recon_with_gt(self):
+        """
+        Test how close the reconstruction to the ground truth really is. Increasing the number of scales lowers the L2
+        norm of the difference between these two.
+        """
         image = misc.face(gray=True)
 
         SHf, spectra = applyShearletTransform(image, jZero=5)
@@ -26,9 +25,9 @@ class TestShearletTransform(unittest.TestCase):
 
     def test_parseval_frame(self):
         """
-        Given that our spectra constitute a Parseval frame, if a matrix mxn A has rows then AtA = I (Corollary 1.4.7
-        from An Introduction to Frames and Riesz Bases). This ensures that the spectra we generated exhibits desired
-        behaviour.
+        If a matrix mxn A has rows that constitute Parseval frame, then AtA = I (Corollary 1.4.7 from An Introduction to
+        Frames and Riesz Bases). Given that our spectra constitute a Parseval frame, we can utilize this property to
+        check if they've been generated correctly.
         """
         image = misc.face(gray=True)
 
