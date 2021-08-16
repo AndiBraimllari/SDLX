@@ -1,4 +1,4 @@
-P = phantom(512);
+P = phantom(512); % imread('IMAGE_NAME.EXT')
 
 % imshow(P);
 
