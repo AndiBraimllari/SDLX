@@ -4,6 +4,9 @@ from shearlet_dl.PhantomNet import PhantomNet
 from shearlet_transform.shearlet_transform_algorithm import applyShearletTransform, applyInverseShearletTransform
 
 
+# Hybrid Reconstruction Using Shearlets and Deep Learning for sparse X-Ray Computed Tomography, codenamed SDLX
+
+
 def generate_limited_angle_ct_data(dir):
     for i in range(len(data)):
         # fetch the next sample
@@ -99,4 +102,6 @@ Additional notes
         still worth trying without it
     3.note that proper training appears to require A LOT of resources, overfit on a handful of samples locally, then
         move to the CIIP machines
+    4.In `generate_limited_angle_ct_data`, what reconstruction method should be used? FBP, TV, CG, ...? Lean towards
+    what's used in production (which is)?
 """
