@@ -10,7 +10,7 @@ import pyelsa as elsa
 
 def generate_sparse_ct_images(src_dir, out_dir, num_angles=50, limit=None):
     """
-    Generate sparsely sampled images from one directory to the other.
+    Generate sparsely sampled images from one directory to the other, through elsa.
     """
     if not os.path.exists(src_dir):
         raise ValueError('The provided src_dir directory does not exist')
