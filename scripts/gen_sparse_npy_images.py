@@ -5,7 +5,7 @@ from tqdm import tqdm
 import pyelsa as elsa
 
 
-def generate_sparse_ct_images(src_dir, out_dir, num_angles=50, limit=None):
+def generate_sparse_npy_images(src_dir, out_dir, num_angles=50, limit=None):
     """
     Generate sparsely sampled images from one directory to the other, through elsa. These images are contained in NumPy
     files.
