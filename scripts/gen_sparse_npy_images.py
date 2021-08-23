@@ -5,7 +5,7 @@ from tqdm import tqdm
 import pyelsa as elsa
 
 
-def generate_sparse_npy_images(src_dir, out_dir, num_angles=50, limit=None):
+def generate_sparse_npy_images(src_dir, out_dir=None, num_angles=50, no_iterations=20, limit=None):
     """
     Generate sparsely sampled images from one directory to the other, through elsa. These images are contained in NumPy
     files.
@@ -13,8 +13,11 @@ def generate_sparse_npy_images(src_dir, out_dir, num_angles=50, limit=None):
     if not os.path.exists(src_dir):
         raise ValueError('The provided src_dir directory does not exist')
 
-    if not os.path.exists(out_dir):
+    if out_dir is not None and not os.path.exists(out_dir):
         os.mkdir(out_dir)
+
+    if out_dir is None:
+        out_dir = '/cg_recon_iters_' + str(no_iterations) + '_poses_' + str(num_angles)
 
     paths = os.listdir(src_dir)
 
@@ -45,8 +48,6 @@ def generate_sparse_npy_images(src_dir, out_dir, num_angles=50, limit=None):
         # solve the reconstruction problem
         cg_solver = elsa.CG(wls_problem)
 
-        no_iterations = 20
         cg_reconstruction = cg_solver.solve(no_iterations)
 
-        new_image_name = out_dir + '/cg_recon_i_' + str(no_iterations) + '_p_' + str(num_angles) + '_' + file_name
-        np.save(new_image_name, cg_reconstruction)
+        np.save(out_dir + '/' + file_name, cg_reconstruction)
