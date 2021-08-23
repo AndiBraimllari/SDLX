@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from pathlib import Path
 from tqdm import tqdm
 
 import pyelsa as elsa
@@ -17,7 +18,9 @@ def generate_sparse_npy_images(src_dir, out_dir=None, num_angles=50, no_iteratio
         os.mkdir(out_dir)
 
     if out_dir is None:
-        out_dir = '/cg_recon_iters_' + str(no_iterations) + '_poses_' + str(num_angles)
+        parent_dir = str(Path(src_dir).parent.absolute())
+        out_dir = parent_dir + '/cg_recon_iters_' + str(no_iterations) + '_poses_' + str(num_angles)
+        os.mkdir(out_dir)
 
     paths = os.listdir(src_dir)
 
