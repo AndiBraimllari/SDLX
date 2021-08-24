@@ -232,7 +232,7 @@ def generate_shearleted_npy_images(src_dir, out_dir=None, scales=None, limit=Non
     for file_name in tqdm(paths):
         image = np.load(src_dir + '/' + file_name)
 
-        if image.shape[0] is not init_width or image.shape[1] is not init_height:
+        if image.shape[0] != init_width or image.shape[1] != init_height:
             raise ValueError('Encountered different shapes of images! We only precomputed for one shape, too bad!')
 
         sh_image, spectra = applyShearletTransform(image, spectra)
