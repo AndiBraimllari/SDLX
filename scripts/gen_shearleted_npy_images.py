@@ -4,11 +4,10 @@ from pathlib import Path
 from tqdm import tqdm
 from os.path import splitext
 
-import pyelsa as elsa
 from shearlet_transform.shearlet_transform_algorithm import applyShearletTransform
 
 
-def generate_shearleted_npy_images(src_dir, out_dir=None, scales=5, limit=None):
+def generate_shearleted_npy_images(src_dir, out_dir=None, scales=None, limit=None):
     """
     Generate shearleted images from one directory to the other. These images are contained in NumPy
     files.
@@ -30,9 +29,9 @@ def generate_shearleted_npy_images(src_dir, out_dir=None, scales=5, limit=None):
         paths = paths[:limit]
 
     for file_name in tqdm(paths):
-        image = elsa.DataContainer(np.load(src_dir + '/' + file_name))
+        image = np.load(src_dir + '/' + file_name)
 
-        sh_image = applyShearletTransform(image, jZero=scales)
+        sh_image, spectra = applyShearletTransform(image, jZero=scales)
 
         file_name_no_ex, extension = splitext(file_name)
 
