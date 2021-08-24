@@ -21,7 +21,10 @@ def generate_shearleted_npy_images(src_dir, out_dir=None, scales=None, limit=Non
 
     if out_dir is None:
         parent_dir = str(Path(src_dir).parent.absolute())
-        out_dir = parent_dir + '/shearleted_scales_' + str(scales)
+        if scales is None:
+            out_dir = parent_dir + '/shearleted_'
+        else:
+            out_dir = parent_dir + '/shearleted_scales_' + str(scales)
         os.mkdir(out_dir)
 
     paths = os.listdir(src_dir)
@@ -29,10 +32,18 @@ def generate_shearleted_npy_images(src_dir, out_dir=None, scales=None, limit=Non
     if limit is not None:
         paths = paths[:limit]
 
+    first_image = np.load(src_dir + '/' + paths[0])
+    init_width = first_image.shape[0]
+    init_height = first_image.shape[1]
+    spectra = calculateSpectra(init_width, init_height, jZero=scales)
+
     for file_name in tqdm(paths):
         image = np.load(src_dir + '/' + file_name)
 
-        sh_image, spectra = applyShearletTransform(image, jZero=scales)
+        if image.shape[0] is not init_width or image.shape[1] is not init_height:
+            raise ValueError('Encountered different shapes of images! We only precomputed for one shape, too bad!')
+
+        sh_image, spectra = applyShearletTransform(image, spectra)
 
         file_name_no_ex, extension = splitext(file_name)
 
