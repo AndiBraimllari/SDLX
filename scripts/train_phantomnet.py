@@ -31,8 +31,8 @@ class ShearletedSlicesDataset(Dataset):
 
 def train_phantomnet(shearlets_dir, multip_gpus=True, num_epochs=50, batch_size=32, learning_rate=5e-5,
                      weight_decay=1e-5, criterion=nn.MSELoss()):
-    sample_shape = np.load(shearlets_dir + '/' + os.listdir(shearlets_dir)[0])
-    oversampling_factor = sample_shape.shape[0]
+    sample_shape = np.load(shearlets_dir + '/' + os.listdir(shearlets_dir)[0]).shape
+    oversampling_factor = sample_shape[0]
 
     shearleted_dataset = ShearletedSlicesDataset(shearlets_dir, shearlets_dir)  # TODO auto-encoder for now
     dataloader = DataLoader(shearleted_dataset, batch_size=batch_size, shuffle=True)
@@ -69,8 +69,8 @@ def train_phantomnet(shearlets_dir, multip_gpus=True, num_epochs=50, batch_size=
     # below here, some predictions are made
 
     # make reshape input dynamic
-    test_sample = torch.reshape(shearleted_dataset.__getitem__(0),
-                                (1, oversampling_factor, sample_shape[0], sample_shape[1])).cuda()
+    test_sample = torch.reshape(shearleted_dataset.__getitem__(0)[1],
+                                (1, oversampling_factor, sample_shape[1], sample_shape[2])).cuda()
     # test_sample = torch.reshape(shearleted_dataset.__getitem__(0), (1, 61, 512, 512))  # .cuda()
 
     pred = pnModel(test_sample)
