@@ -5,13 +5,19 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 import os
 from matplotlib import pyplot as plt
+from datetime import datetime
+from pathlib import Path
+import sys
+
+# add the parent of the parent of this file to the system path
+sys.path.append(str(Path(os.path.abspath(Path(__file__).parent)).parent))
 
 from shearlet_dl.PhantomNet import PhantomNet
 
 
 class ShearletedSlicesDataset(Dataset):
     """Class representing a dataset of shearleted images. Items are fetched on the assumption that the files
-    contained in the X/Y_dir are of the format NUMBER.npy for NUMBER from 0 to length - 1."""
+    contained in the X/Y_dir are of the format NUMBER.npy, for NUMBER from 0 to length - 1."""
 
     def __init__(self, X_dir, Y_dir):
         self.X_dir = X_dir
@@ -30,7 +36,8 @@ class ShearletedSlicesDataset(Dataset):
 
 
 def train_phantomnet(shearlets_dir, multip_gpus=True, num_epochs=50, batch_size=32, learning_rate=5e-5,
-                     weight_decay=1e-5, criterion=nn.MSELoss()):
+                     weight_decay=1e-5, criterion=nn.MSELoss(), visualize_loss=True, visualize_pred=True,
+                     save_model=True):
     sample_shape = np.load(shearlets_dir + '/' + os.listdir(shearlets_dir)[0]).shape
     oversampling_factor = sample_shape[0]
 
@@ -62,31 +69,31 @@ def train_phantomnet(shearlets_dir, multip_gpus=True, num_epochs=50, batch_size=
         loss_hst.append(loss.data.cpu().detach().numpy())
         print('epoch [{}/{}], loss:{:.4f}'.format(epoch + 1, num_epochs, loss.data))
 
-    print(loss_hst)
-    plt.plot(loss_hst)
-    plt.show()
-
-    # below here, some predictions are made
+    if visualize_loss:
+        plt.plot(loss_hst)
+        plt.show()
 
     # make reshape input dynamic
     test_sample = torch.reshape(shearleted_dataset.__getitem__(0)[1],
                                 (1, oversampling_factor, sample_shape[1], sample_shape[2])).cuda()
-    # test_sample = torch.reshape(shearleted_dataset.__getitem__(0), (1, 61, 512, 512))  # .cuda()
 
     pred = pnModel(test_sample)
 
-    plt.imshow(test_sample[0][8].cpu().detach().numpy())
-    plt.title('test sample 8')
-    plt.show()
+    if save_model:
+        model_name = pnModel.__class__.__name__ + '_epochs_' + str(num_epochs) + '_lr_' + str(
+            learning_rate) + '_datetime_' + str(datetime.now()) + '_model'
+        model_name = model_name.replace(' ', '_')
+        print('Model name to be saved is: ' + model_name)
+        torch.save(pnModel.state_dict(), model_name)
 
-    plt.imshow(pred[0][8].cpu().detach().numpy())
-    plt.title('pred 8')
-    plt.show()
+    if visualize_pred:
+        i = 0  # randomly choose this
+        j = 8  # randomly choose this
 
-    plt.imshow(test_sample[0][6].cpu().detach().numpy())
-    plt.title('test sample 6')
-    plt.show()
+        plt.imshow(test_sample[i][j].cpu().detach().numpy())
+        plt.title('test sample ' + str(i) + ' at shearlet coeff. ' + str(j))
+        plt.show()
 
-    plt.imshow(pred[0][6].cpu().detach().numpy())
-    plt.title('pred 6')
-    plt.show()
+        plt.imshow(pred[i][j].cpu().detach().numpy())
+        plt.title('pred. ' + str(i) + ' at shearlet coeff. ' + str(j))
+        plt.show()

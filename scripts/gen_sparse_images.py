@@ -5,6 +5,7 @@ from skimage import io
 import os
 from tqdm import tqdm
 
+# this script is to be run in an environment with the Python bindings of elsa installed
 import pyelsa as elsa
 
 
