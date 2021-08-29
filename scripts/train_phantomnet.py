@@ -26,7 +26,7 @@ class ShearletedSlicesDataset(Dataset):
     def __len__(self):  # TODO
         return len(os.listdir(self.X_dir))
 
-    def __getitem__(self, idx):  # ideally this is loaded per-request and not all objects should be kept in memory
+    def __getitem__(self, idx):
         X = np.load(self.X_dir + '/' + str(idx) + '.npy')
         Y = np.load(self.Y_dir + '/' + str(idx) + '.npy')
 
