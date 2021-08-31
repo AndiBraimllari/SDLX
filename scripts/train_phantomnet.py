@@ -35,13 +35,13 @@ class ShearletedSlicesDataset(Dataset):
         return X, Y
 
 
-def train_phantomnet(shearlets_dir, multip_gpus=True, num_epochs=50, batch_size=32, learning_rate=5e-5,
+def train_phantomnet(X_dir, Y_dir, multip_gpus=True, num_epochs=50, batch_size=32, learning_rate=5e-5,
                      weight_decay=1e-5, criterion=nn.MSELoss(), visualize_loss=True, visualize_pred=True,
                      save_model=True):
-    sample_shape = np.load(shearlets_dir + '/' + os.listdir(shearlets_dir)[0]).shape
+    sample_shape = np.load(X_dir + '/' + os.listdir(X_dir)[0]).shape
     oversampling_factor = sample_shape[0]
 
-    shearleted_dataset = ShearletedSlicesDataset(shearlets_dir, shearlets_dir)  # TODO auto-encoder for now
+    shearleted_dataset = ShearletedSlicesDataset(X_dir, Y_dir)
     dataloader = DataLoader(shearleted_dataset, batch_size=batch_size, shuffle=True)
 
     pnModel = PhantomNet(oversampling_factor)
