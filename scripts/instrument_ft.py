@@ -24,9 +24,19 @@ def instrument_fourier_transform(source, destination, inverse):
     arr = np.array(obj)
 
     if not inverse:
-        output = np.fft.fft2(arr)
+        if len(arr.shape) == 3:
+            output = np.fft.fft2(arr, axes=(0, 1))  # TODO double check this
+        elif len(arr.shape) == 2:
+            output = np.fft.fft2(arr)
+        else:
+            raise ValueError('huh?!')
     else:
-        output = np.fft.ifft2(arr)
+        if len(arr.shape) == 3:
+            output = np.fft.ifft2(arr, axes=(0, 1))  # TODO double check this
+        elif len(arr.shape) == 2:
+            output = np.fft.ifft2(arr)
+        else:
+            raise ValueError('huh?!')
 
     output = np.real(output)
 
