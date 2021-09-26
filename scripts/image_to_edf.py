@@ -15,4 +15,4 @@ def image_to_edf(image_path):
     elsa.EDF.write(elsa.DataContainer(image), image_path_wo_suffix + '.edf')
 
 
-image_to_edf('/home/andibraimllari/Desktop/playground/elsa/cmake-build-debug/slice_511.jpg')
+image_to_edf(None)
