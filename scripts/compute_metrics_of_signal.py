@@ -17,20 +17,20 @@ def compute_metrics(ground_truth, reconstruction):
         raise ValueError('different shapes of signals!')
 
     a = relative_error(ground_truth, reconstruction)
-    print(
-        'Relative error (the lower the better): [' + str(a) + '] for a signal of shape: [' + reconstruction.shape + ']')
+    print('Relative error (the lower the better): [' + str(a) + '] for a signal of shape: [' + str(
+        reconstruction.shape) + ']')
 
     b = peak_signal_noise_ratio(ground_truth, reconstruction, data_range=1)  # TODO correct data_range
     print('Peak signal-to-noise ratio error (the higher the better): [' + str(
-        b) + '] for a signal of shape: [' + reconstruction.shape + ']')
+        b) + '] for a signal of shape: [' + str(reconstruction.shape) + ']')
 
     c = structural_similarity(ground_truth, reconstruction)
     print('Structural similarity (the higher the better): [' + str(
-        c) + '] for a signal of shape: [' + reconstruction.shape + ']')
+        c) + '] for a signal of shape: [' + str(reconstruction.shape) + ']')
 
-    d = haar_psi(ground_truth, reconstruction)
+    d = haar_psi(ground_truth, reconstruction)  # note that haar_psi returns 3 elements, the first is the metric
     print('Haar wavelet-based perceptual similarity index error (the higher the better): [' + str(
-        d) + '] for a signal of shape: [' + reconstruction.shape + ']')
+        d[0]) + '] for a signal of shape: [' + str(reconstruction.shape) + ']')
 
 
 def read_edf(signal_path):
