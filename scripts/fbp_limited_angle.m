@@ -1,12 +1,14 @@
-P = phantom(512); % imread('IMAGE_NAME.EXT')
+src = ;
+dest = ;
 
-% imshow(P);
+P = rgb2gray(imread(src));
 
-theta = 0:180;
-[R,xp] = radon(P, theta);
+theta = 0:359;
+[R, xp] = radon(P, theta);
 
-R(:, 45:135) = 0;
+R(:, 60: 120) = 0;
+R(:, 60 + 180: 120 + 180) = 0;
 
 IR = iradon(R, theta, 'linear','Ram-Lak');
 
-imshow(IR);
+imwrite(uint8(IR), dest);
